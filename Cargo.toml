@@ -5,7 +5,6 @@ edition = "2021"
 authors = ["Gustavo Muenz <edisongustavo@gmail.com>"]
 description = "Rust implementation for Amazon States Language"
 license = "MIT"
-license-file = "LICENSE"
 repository = "https://github.com/edisongustavo/asl-rust"
 
 [dependencies]
