@@ -2,7 +2,10 @@
 name = "asl-rust"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Gustavo Muenz <edisongustavo@gmail.com>"]
+description = "Rust implementation for Amazon States Language"
+license = "MIT"
+license-file = "LICENSE"
+repository = "https://github.com/edisongustavo/asl-rust"
 
 [dependencies]
