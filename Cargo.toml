@@ -1,10 +1,21 @@
 [package]
 name = "asl"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Gustavo Muenz <edisongustavo@gmail.com>"]
 description = "Rust implementation for Amazon States Language"
 license = "MIT"
 repository = "https://github.com/edisongustavo/asl-rust"
 
+[lib]
+
 [dependencies]
+thiserror = "1.0.57"
+serde_json = "1.0.114"
+serde = { version = "1.0.197", features = ["derive"] }
+
+[dev-dependencies]
+itertools = "0.12.1"
+map-macro = "0.3.0"
+anyhow = "1.0.80"
+rstest = "0.18.2"
