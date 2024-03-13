@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use serde::Deserialize;
 use serde_json::{Value};
+use crate::asl::states::State;
 use crate::asl::types::{MyJsonPath, Payload};
 
 
@@ -8,7 +9,7 @@ use crate::asl::types::{MyJsonPath, Payload};
 #[serde(rename_all = "PascalCase")]
 pub struct MapStateIterator {
     start_at: String,
-    states: HashMap<String, crate::asl::state_machine::State>,
+    states: HashMap<String, State>,
     processor_config: Option<Value>,
 
 }
