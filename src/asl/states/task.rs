@@ -19,3 +19,14 @@ pub enum HeartbeatSecondsOrPath {
     HeartbeatSeconds(u32),
     HeartbeatSecondsPath(MyJsonPath)
 }
+
+// pub struct TaskExecutionError {
+//     error_name: ErrorName,
+//     // cause:
+//     // #[error("Missing the 'StartsAt' field")]
+//     // StartStateNotDefinedInListOfStates,
+//     //
+//     // #[error("Malformed input: {0}")]
+//     // MalformedInput(SerdeError),
+// }
+

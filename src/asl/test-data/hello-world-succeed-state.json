@@ -1,0 +1,14 @@
+{
+  "Comment": "A simple minimal example of the States language",
+  "StartAt": "Hello World",
+  "States": {
+    "Hello World": {
+      "Type": "Task",
+      "Resource": "Return",
+      "Next": "Succeed State"
+    },
+    "Succeed State": {
+      "Type": "Succeed"
+    }
+  }
+}
