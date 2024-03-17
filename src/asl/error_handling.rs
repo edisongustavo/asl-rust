@@ -1,6 +1,6 @@
 use serde_json::Number;
 use serde::Deserialize;
-use crate::asl::types::MyJsonPath;
+use crate::asl::types::DynamicValue;
 
 // TODO: Maybe this could be a parameter. It could be a string or a parameter type of the StateMachine...
 #[derive(Deserialize, Debug, PartialEq, Eq)]
@@ -10,9 +10,9 @@ enum JitterStrategy {
 }
 
 /// See https://states-language.net/spec.html#appendix-a
-#[derive(Deserialize, Debug, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
-enum ErrorName {
+pub enum StateMachineExecutionError {
     /// A wildcard which matches any Error Name.
     #[serde(rename = "States.ALL")]
     StatesALL,
@@ -72,7 +72,7 @@ enum ErrorName {
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Retrier {
-    error_equals: Vec<ErrorName>,
+    error_equals: Vec<StateMachineExecutionError>,
 
     #[serde(default="max_attempts_default")]
     max_attempts: u32,
@@ -100,7 +100,7 @@ fn backoff_rate_default() -> Number {
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Catcher {
-    error_equals: Vec<ErrorName>,
+    error_equals: Vec<StateMachineExecutionError>,
     next: String,
-    result_path: Option<MyJsonPath>
+    result_path: Option<DynamicValue>
 }

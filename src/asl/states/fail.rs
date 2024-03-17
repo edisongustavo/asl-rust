@@ -1,14 +1,14 @@
 use serde::Deserialize;
-use crate::asl::types::MyJsonPath;
+use crate::asl::types::DynamicValue;
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum FailStateErrorField {
     Error(String),
-    ErrorPath(MyJsonPath)
+    ErrorPath(DynamicValue)
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum FailStateCauseField {
     Cause(String),
-    CausePath(MyJsonPath)
+    CausePath(DynamicValue)
 }

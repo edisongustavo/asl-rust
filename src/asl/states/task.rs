@@ -1,11 +1,11 @@
 use serde_json::Number;
 use serde::Deserialize;
-use crate::asl::types::MyJsonPath;
+use crate::asl::types::DynamicValue;
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum TimeoutSecondsOrPath {
     TimeoutSeconds(Number),
-    TimeoutSecondsPath(MyJsonPath)
+    TimeoutSecondsPath(DynamicValue)
 }
 
 impl Default for TimeoutSecondsOrPath {
@@ -17,7 +17,7 @@ impl Default for TimeoutSecondsOrPath {
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum HeartbeatSecondsOrPath {
     HeartbeatSeconds(u32),
-    HeartbeatSecondsPath(MyJsonPath)
+    HeartbeatSecondsPath(DynamicValue)
 }
 
 // pub struct TaskExecutionError {

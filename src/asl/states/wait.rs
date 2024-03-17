@@ -1,11 +1,11 @@
 use serde::Deserialize;
 use serde_json::Number;
-use crate::asl::types::{MyJsonPath, Timestamp};
+use crate::asl::types::{DynamicValue, Timestamp};
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum WaitDuration {
     Seconds(Number),
-    SecondsPath(MyJsonPath),
+    SecondsPath(DynamicValue),
     Timestamp(Timestamp),
-    TimestampPath(MyJsonPath),
+    TimestampPath(DynamicValue),
 }

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use serde::Deserialize;
 use serde_json::{Value};
-use crate::asl::states::State;
-use crate::asl::types::{MyJsonPath, Payload};
+use crate::asl::states::all_states::State;
+use crate::asl::types::{DynamicValue, Payload};
 
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
@@ -21,25 +21,25 @@ pub struct ResultWriterConfiguration {}
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum ToleratedFailurePercentage {
     ToleratedFailurePercentage(u32),
-    ToleratedFailurePercentagePath(MyJsonPath),
+    ToleratedFailurePercentagePath(DynamicValue),
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum ToleratedFailureCount {
     ToleratedFailureCount(u32),
-    ToleratedFailureCountPath(MyJsonPath),
+    ToleratedFailureCountPath(DynamicValue),
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum MaxItemsPerBatch {
     MaxItemsPerBatch(u32),
-    MaxItemsPerBatchPath(MyJsonPath),
+    MaxItemsPerBatchPath(DynamicValue),
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum MaxInputBytesPerBatch {
     MaxInputBytesPerBatch(u32),
-    MaxInputBytesPerBatchPath(MyJsonPath),
+    MaxInputBytesPerBatchPath(DynamicValue),
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
