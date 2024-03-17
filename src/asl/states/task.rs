@@ -1,11 +1,11 @@
-use serde_json::Number;
-use serde::Deserialize;
 use crate::asl::types::DynamicValue;
+use serde::Deserialize;
+use serde_json::Number;
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum TimeoutSecondsOrPath {
     TimeoutSeconds(Number),
-    TimeoutSecondsPath(DynamicValue)
+    TimeoutSecondsPath(DynamicValue),
 }
 
 impl Default for TimeoutSecondsOrPath {
@@ -17,7 +17,7 @@ impl Default for TimeoutSecondsOrPath {
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum HeartbeatSecondsOrPath {
     HeartbeatSeconds(u32),
-    HeartbeatSecondsPath(DynamicValue)
+    HeartbeatSecondsPath(DynamicValue),
 }
 
 // pub struct TaskExecutionError {
@@ -29,4 +29,3 @@ pub enum HeartbeatSecondsOrPath {
 //     // #[error("Malformed input: {0}")]
 //     // MalformedInput(SerdeError),
 // }
-

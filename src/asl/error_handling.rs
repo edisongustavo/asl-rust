@@ -1,6 +1,6 @@
-use serde_json::Number;
-use serde::Deserialize;
 use crate::asl::types::DynamicValue;
+use serde::Deserialize;
+use serde_json::Number;
 
 // TODO: Maybe this could be a parameter. It could be a string or a parameter type of the StateMachine...
 #[derive(Deserialize, Debug, PartialEq, Eq)]
@@ -74,12 +74,12 @@ pub enum StateMachineExecutionError {
 pub struct Retrier {
     error_equals: Vec<StateMachineExecutionError>,
 
-    #[serde(default="max_attempts_default")]
+    #[serde(default = "max_attempts_default")]
     max_attempts: u32,
-    #[serde(default="interval_seconds_default")]
+    #[serde(default = "interval_seconds_default")]
     interval_seconds: Number,
     max_delay_seconds: Option<Number>,
-    #[serde(default="backoff_rate_default")]
+    #[serde(default = "backoff_rate_default")]
     backoff_rate: Number,
     jitter_strategy: Option<JitterStrategy>,
 }
@@ -93,14 +93,15 @@ fn interval_seconds_default() -> Number {
 }
 
 fn backoff_rate_default() -> Number {
-    Number::from_f64(2.0).expect("Can't convert default hardcoded value. Something's off in the configuration of Serde")
+    Number::from_f64(2.0).expect(
+        "Can't convert default hardcoded value. Something's off in the configuration of Serde",
+    )
 }
-
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "PascalCase")]
 pub struct Catcher {
     error_equals: Vec<StateMachineExecutionError>,
     next: String,
-    result_path: Option<DynamicValue>
+    result_path: Option<DynamicValue>,
 }

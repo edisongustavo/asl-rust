@@ -7,7 +7,10 @@ use thiserror::Error;
 pub enum IntrinsicFunction {}
 
 impl IntrinsicFunction {
-    pub fn evaluate(&self, input: &Value) -> Result<Option<Value>, IntrinsicFunctionExecutionError> {
+    pub fn evaluate(
+        &self,
+        input: &Value,
+    ) -> Result<Option<Value>, IntrinsicFunctionExecutionError> {
         todo!()
     }
 }
@@ -18,7 +21,11 @@ pub enum IntrinsicFunctionParseError {
     Unknown(String),
 
     #[error("The intrinsic function '{name}' expected {expected} arguments, but only {actual} arguments were provided")]
-    InsufficientArguments { name: String, expected: usize, actual: usize },
+    InsufficientArguments {
+        name: String,
+        expected: usize,
+        actual: usize,
+    },
 }
 
 #[derive(Error, Debug)]
@@ -26,7 +33,6 @@ pub enum IntrinsicFunctionExecutionError {
     #[error("Wrong argument types specified to function")]
     WrongArguments, // TODO: Improve error
 }
-
 
 impl TryFrom<&str> for IntrinsicFunction {
     type Error = IntrinsicFunctionParseError;

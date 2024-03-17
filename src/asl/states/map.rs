@@ -1,9 +1,8 @@
-use std::collections::HashMap;
-use serde::Deserialize;
-use serde_json::{Value};
 use crate::asl::states::all_states::State;
 use crate::asl::types::{DynamicValue, Payload};
-
+use serde::Deserialize;
+use serde_json::Value;
+use std::collections::HashMap;
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "PascalCase")]
@@ -11,7 +10,6 @@ pub struct MapStateIterator {
     start_at: String,
     states: HashMap<String, State>,
     processor_config: Option<Value>,
-
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]

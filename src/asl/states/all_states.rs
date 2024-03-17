@@ -1,13 +1,15 @@
-use serde::Deserialize;
-use serde_json::Value;
-use std::collections::HashMap;
 use crate::asl::error_handling::{Catcher, Retrier};
 use crate::asl::states::choice::ChoiceRule;
 use crate::asl::states::fail::{FailStateCauseField, FailStateErrorField};
-use crate::asl::states::map::{ItemBatcherConfiguration, MapStateIterator, ResultWriterConfiguration};
+use crate::asl::states::map::{
+    ItemBatcherConfiguration, MapStateIterator, ResultWriterConfiguration,
+};
 use crate::asl::states::task::{HeartbeatSecondsOrPath, TimeoutSecondsOrPath};
 use crate::asl::states::wait::WaitDuration;
-use crate::asl::types::{InvertedJsonPath, DynamicValue, Parameters, Payload, ResultSelector};
+use crate::asl::types::{DynamicValue, InvertedJsonPath, Parameters, Payload, ResultSelector};
+use serde::Deserialize;
+use serde_json::Value;
+use std::collections::HashMap;
 
 /// According to the docs, these are the available common fields for the states:
 ///
@@ -83,7 +85,7 @@ pub enum State {
     #[serde(rename_all = "PascalCase")]
     Map {
         max_concurrency: Option<u32>,
-        #[serde(alias="Iterator")]
+        #[serde(alias = "Iterator")]
         item_processor: MapStateIterator,
         items_path: Option<DynamicValue>,
         item_selector: Option<HashMap<InvertedJsonPath, DynamicValue>>,
@@ -160,5 +162,5 @@ pub enum State {
 #[derive(Deserialize, Debug, PartialEq, Eq)]
 pub enum EndOrNext {
     End(bool), //TODO: Check how to remove this "bool"
-    Next(String)
+    Next(String),
 }

@@ -1,3 +1,4 @@
+use crate::asl::error_handling::StateMachineExecutionError;
 use crate::asl::execution::{Execution, ExecutionStatus, StateExecutionHandler};
 use crate::asl::states::all_states::State;
 use crate::asl::types::StateMachineContext;
@@ -6,7 +7,6 @@ use serde::Deserialize;
 use serde_json::{Error as SerdeError, Number, Value};
 use std::collections::HashMap;
 use thiserror::Error;
-use crate::asl::error_handling::StateMachineExecutionError;
 
 #[derive(Error, Debug)]
 pub enum ParseError {

@@ -1,6 +1,6 @@
+pub mod all_states;
 pub mod choice;
 pub mod fail;
-pub mod wait;
-pub mod task;
 pub mod map;
-pub mod all_states;
+pub mod task;
+pub mod wait;

@@ -1,14 +1,14 @@
+use crate::asl::error_handling::StateMachineExecutionError;
+use crate::asl::execution::ExecutionStatus::FinishedWithFailure;
 use crate::asl::state_machine::StateMachineDefinition;
 use crate::asl::states::all_states::{EndOrNext, State};
+use crate::asl::states::fail::{FailStateCauseField, FailStateErrorField};
 use crate::asl::states::wait::WaitDuration;
 use crate::asl::types::{ExecutionInput, StateMachineContext};
 use itertools::Itertools;
 use serde_json::Value;
 use std::time::Duration;
 use thiserror::Error;
-use crate::asl::error_handling::StateMachineExecutionError;
-use crate::asl::execution::ExecutionStatus::FinishedWithFailure;
-use crate::asl::states::fail::{FailStateCauseField, FailStateErrorField};
 
 pub struct Execution<'a, T>
 where
@@ -32,14 +32,17 @@ pub enum ExecutionStatus {
     // NotStarted,
     Executing,
     FinishedWithSuccess,
-    FinishedWithFailure { error: Option<StateMachineExecutionError>, cause: Option<String> },
+    FinishedWithFailure {
+        error: Option<StateMachineExecutionError>,
+        cause: Option<String>,
+    },
 }
 
 impl ExecutionStatus {
     pub fn with_error_and_cause(error: &str, cause: &str) -> ExecutionStatus {
         FinishedWithFailure {
             error: Some(StateMachineExecutionError::Custom(String::from(error))),
-            cause: Some(String::from(cause))
+            cause: Some(String::from(cause)),
         }
     }
 }
@@ -158,7 +161,10 @@ where
                             None => {
                                 //TODO: Maybe we want to use the fallible_iterators crate for this situation.
                                 self.next_state_name = None;
-                                self.status = FinishedWithFailure { error: Some(StateMachineExecutionError::StatesNoChoiceMatched), cause: None };
+                                self.status = FinishedWithFailure {
+                                    error: Some(StateMachineExecutionError::StatesNoChoiceMatched),
+                                    cause: None,
+                                };
                             }
                             Some(default_state_name) => {
                                 self.next_state_name = Some(default_state_name);
@@ -189,7 +195,7 @@ where
                     };
                     e.clone()
                 });
-                self.status = FinishedWithFailure{ error, cause };
+                self.status = FinishedWithFailure { error, cause };
                 self.next_state_name = None;
             }
         }

@@ -180,7 +180,10 @@ fn execute_choice(
         .map(|e| e.state_name.as_ref().unwrap_or(&String::new()).clone())
         .collect_vec();
     assert_eq!(expected_states, actual_states);
-    assert_eq!(final_execution_status, execution_steps.last().unwrap().status);
+    assert_eq!(
+        final_execution_status,
+        execution_steps.last().unwrap().status
+    );
 
     Ok(())
 }

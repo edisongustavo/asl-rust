@@ -50,12 +50,10 @@ impl DynamicValue {
             // DynamicValue::Context(path) => path.evaluate(input.context.into()),
             DynamicValue::Context(path) => todo!(),
             DynamicValue::Value(val) => Ok(Some(val.clone())), //TODO: remove clone()
-            DynamicValue::IntrinsicFunction(function) => {
-                function
-                    .evaluate(input.value)
-                    .map_err(|e| DynamicValueEvaluateError::IntrinsicFunctionExecutionError(e))
-            },
-            DynamicValue::Identity => Ok(Some(input.value.clone())),  //TODO: remove clone()
+            DynamicValue::IntrinsicFunction(function) => function
+                .evaluate(input.value)
+                .map_err(|e| DynamicValueEvaluateError::IntrinsicFunctionExecutionError(e)),
+            DynamicValue::Identity => Ok(Some(input.value.clone())), //TODO: remove clone()
         }
     }
 }
