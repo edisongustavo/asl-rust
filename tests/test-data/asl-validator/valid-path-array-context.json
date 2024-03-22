@@ -4,7 +4,7 @@
   "States": {
     "Pass": {
       "Type": "Pass",
-      "OutputPath": "$[(@.length-1)].bar",
+      "OutputPath": "$[?(@.length)].bar",
       "End": true
     }
   }

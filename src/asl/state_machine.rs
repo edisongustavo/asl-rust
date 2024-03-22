@@ -1,11 +1,10 @@
-use crate::asl::error_handling::StateMachineExecutionError;
 use crate::asl::execution::{Execution, ExecutionStatus, StateExecutionHandler};
-use crate::asl::states::all_states::State;
+use crate::asl::states::all_states::States;
 use crate::asl::types::StateMachineContext;
-use itertools::Itertools;
 use serde::Deserialize;
 use serde_json::{Error as SerdeError, Number, Value};
 use std::collections::HashMap;
+use std::rc::Rc;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -23,7 +22,7 @@ pub enum ParseError {
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct StateMachineDefinition {
-    pub states: HashMap<String, State>,
+    pub states: HashMap<String, States>,
     pub comment: Option<String>,
     pub start_at: String,
     pub version: Option<String>,
@@ -33,9 +32,6 @@ pub struct StateMachineDefinition {
 pub struct StateMachine {
     definition: StateMachineDefinition,
 }
-
-struct DumbContext {}
-impl StateMachineContext for DumbContext {}
 
 impl StateMachine {
     pub fn parse(definition: &str) -> Result<StateMachine, ParseError> {
@@ -47,23 +43,25 @@ impl StateMachine {
         Ok(state_machine)
     }
 
-    pub fn start<T>(&self, input: &Value, state_execution_handler: T) -> Execution<T>
+    pub fn start<T>(
+        &self,
+        input: &Value,
+        state_execution_handler: T,
+        context: Rc<dyn StateMachineContext>,
+    ) -> Execution<T>
     where
         T: StateExecutionHandler,
     {
         let start_state_name = &self.definition.start_at;
-        let start_state = self.definition.states.get(start_state_name).expect(
-            format!("Can't find the start state {start_state_name} from the list of states: {}. This ia bug in the parser.",
-                    self.definition.states.keys().join(", ")).as_str());
 
         // TODO: Implement Context object. Maybe receive it as a parameter?
         Execution {
             definition: &self.definition,
-            next_state_name: Some(start_state_name),
+            next_state_name: Some(start_state_name.clone()),
             state_execution_handler,
             input: input.clone(),
             status: ExecutionStatus::Executing,
-            context: Box::new(DumbContext {}),
+            context,
         }
     }
 }
@@ -72,6 +70,7 @@ impl StateMachine {
 mod tests {
     use super::*;
     use crate::asl::states::all_states::EndOrNext;
+    use crate::asl::states::task::Task;
     use anyhow::Result;
     use itertools::Itertools;
     use rstest::*;
@@ -88,12 +87,15 @@ mod tests {
             state_machine.definition.states.keys().collect_vec(),
             vec!["Hello World"]
         );
-        let state_hello_world = &state_machine.definition.states["Hello World"];
+        let States::Task(state_hello_world) = &state_machine.definition.states["Hello World"]
+        else {
+            panic!()
+        };
         assert_eq!(
             state_hello_world,
-            &State::Task {
+            &Task {
                 comment: None,
-                end_or_next: EndOrNext::End(true),
+                end_or_next: EndOrNext::End,
                 resource: String::from("Return"),
                 credentials: None,
                 input_path: None,
@@ -129,14 +131,4 @@ mod tests {
         assert_eq!(ret.is_err(), true);
         Ok(())
     }
-
-    // #[rstest]
-    // fn execute_valid_cases(#[files("src/**/tests-data/asl-validator/valid-*.json")] path: PathBuf) -> Result<()> {
-    //     let definition = fs::read_to_string(path)?;
-    //     let state_machine = StateMachine::parse(definition.as_str())?;
-    //     state_machine.start(serde_json::from_str(r#"
-    //             "#)?,
-    //     );
-    //     Ok(())
-    // }
 }

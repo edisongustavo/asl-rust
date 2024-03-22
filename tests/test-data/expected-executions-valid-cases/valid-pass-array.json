@@ -1,0 +1,17 @@
+[
+  {
+    "input": {"foo": 4, "emptyState": [0, 1, 2, 3]},
+    "output": {"foo": 4, "emptyState": [0, 1, 2, 3]},
+    "states": [
+      "EmptyState"
+    ]
+  },
+
+  {
+    "input": {"foo": 4},
+    "output": {"foo": 4},
+    "states": [
+      "EmptyState"
+    ]
+  }
+]

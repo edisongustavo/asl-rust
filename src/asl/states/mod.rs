@@ -2,5 +2,8 @@ pub mod all_states;
 pub mod choice;
 pub mod fail;
 pub mod map;
+pub mod parallel;
+pub mod pass;
+pub mod succeed;
 pub mod task;
 pub mod wait;

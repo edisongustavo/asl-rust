@@ -1,0 +1,20 @@
+[
+  {
+    "input": {"books": [0, 1, 2, 3]},
+    "output": 2,
+    "states": [
+      "PassState"
+    ]
+  },
+
+  {
+    "input": {"books": [0]},
+    "error": {
+      "Error": "DefaultStateError",
+      "Cause": "No Matches!"
+    },
+    "states": [
+      "FirstState", "ChoiceState", "DefaultState"
+    ]
+  }
+]

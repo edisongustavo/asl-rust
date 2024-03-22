@@ -1,0 +1,43 @@
+[
+  {
+    "input": "",
+    "output": "",
+    "states": ["HelloWorld"],
+    "task_behavior": {
+      
+    }
+  },
+
+  {
+    "input": "",
+    "error": {
+      "Error": "CustomError"
+    },
+    "states": ["HelloWorld", "CustomErrorFallback"],
+    "task_behavior": {
+      "FUNCTION_NAME": {"error":  "CustomError"}
+    }
+  },
+
+  {
+    "input": "",
+    "error": {
+      "Error": "States.TaskFailed"
+    },
+    "states": ["HelloWorld", "ReservedTypeFallback"],
+    "task_behavior": {
+      "FUNCTION_NAME": {"error": "States.TaskFailed"}
+    }
+  },
+
+  {
+    "input": "",
+    "error": {
+      "Error": "States.ALL"
+    },
+    "states": ["HelloWorld", "CatchAllFallback"],
+    "task_behavior": {
+      "FUNCTION_NAME": {"error": "States.ALL"}
+    }
+  }
+]

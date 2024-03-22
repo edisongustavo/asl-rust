@@ -1,0 +1,36 @@
+[
+  {
+    "input": {"foo": 1},
+    "output": {"foo": 1},
+    "states": [
+      "FirstState", "ChoiceState", "FirstMatchState", "NextState"
+    ]
+  },
+
+  {
+    "input": {"foo": 2},
+    "output": {"foo": 2},
+    "states": [
+      "FirstState", "ChoiceState", "SecondMatchState", "NextState"
+    ]
+  },
+
+  {
+    "input": {"foo": 3},
+    "output": {"foo": 3},
+    "states": [
+      "FirstState", "ChoiceState", "SecondMatchState", "NextState"
+    ]
+  },
+
+  {
+    "input": {"foo": 4},
+    "error": {
+      "Error": "DefaultStateError",
+      "Cause": "No Matches!"
+    },
+    "states": [
+      "FirstState", "ChoiceState", "DefaultState"
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+[
+  {
+    "input": {"fooList": ["DONE"]},
+    "output": {"foo": 1},
+    "states": [
+      "FirstState", "ForLoopCondition", "Succeed"
+    ]
+  },
+
+  {
+    "input": {"fooList": ["Item0", "DONE"]},
+    "output": {"foo": 2},
+    "states": [
+      "FirstState", "ForLoopCondition", "PassState", "ForLoopCondition", "PassState", "Succeed"
+    ]
+  },
+
+  {
+    "input": {"fooList": []},
+    "output": {"foo": 3},
+    "states": [
+      "FirstState", "ForLoopCondition", "PassState", "ForLoopCondition", "PassState", "Succeed"
+    ]
+  },
+
+  {
+    "input": {"foo": 4},
+    "error": {
+      "Error": "DefaultStateError",
+      "Cause": "No Matches!"
+    },
+    "states": [
+      "FirstState", "ChoiceState", "DefaultState"
+    ]
+  }
+]

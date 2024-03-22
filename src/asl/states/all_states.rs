@@ -1,15 +1,12 @@
-use crate::asl::error_handling::{Catcher, Retrier};
-use crate::asl::states::choice::ChoiceRule;
-use crate::asl::states::fail::{FailStateCauseField, FailStateErrorField};
-use crate::asl::states::map::{
-    ItemBatcherConfiguration, MapStateIterator, ResultWriterConfiguration,
-};
-use crate::asl::states::task::{HeartbeatSecondsOrPath, TimeoutSecondsOrPath};
-use crate::asl::states::wait::WaitDuration;
-use crate::asl::types::{DynamicValue, InvertedJsonPath, Parameters, Payload, ResultSelector};
+use crate::asl::states::choice::Choice;
+use crate::asl::states::fail::Fail;
+use crate::asl::states::map::Map;
+use crate::asl::states::parallel::Parallel;
+use crate::asl::states::pass::Pass;
+use crate::asl::states::succeed::Succeed;
+use crate::asl::states::task::Task;
+use crate::asl::states::wait::Wait;
 use serde::Deserialize;
-use serde_json::Value;
-use std::collections::HashMap;
 
 /// According to the docs, these are the available common fields for the states:
 ///
@@ -24,143 +21,66 @@ use std::collections::HashMap;
 /// | ResultSelector                 | Allowed  | Allowed  | Allowed  |          |          |          |          |          |
 /// | Retry, Catch                   | Allowed  | Allowed  | Allowed  |          |          |          |          |          |
 #[derive(Deserialize, Debug, PartialEq, Eq)]
-#[serde(rename_all = "PascalCase", tag = "Type")]
-pub enum State {
+#[serde(tag = "Type")]
+pub enum States {
     /// See docs: https://states-language.net/spec.html#task-state
-    #[serde(rename_all = "PascalCase")]
-    Task {
-        /// A Task State MUST include a "Resource" field, whose value MUST be a URI that uniquely
-        /// identifies the specific task to execute.
-        /// The States language does not constrain the URI scheme nor any other part of the URI.
-        resource: String,
-
-        /// Tasks can optionally specify timeouts. Timeouts (the "TimeoutSeconds" and "HeartbeatSeconds" fields) are specified in seconds and MUST be positive integers.
-        ///
-        /// Both the total and heartbeat timeouts can be provided indirectly. A Task State may have "TimeoutSecondsPath" and "HeartbeatSecondsPath" fields which MUST be Reference Paths which, when resolved, MUST select fields whose values are positive integers. A Task State MUST NOT include both "TimeoutSeconds" and "TimeoutSecondsPath" or both "HeartbeatSeconds" and "HeartbeatSecondsPath".
-        //
-        /// If provided, the "HeartbeatSeconds" interval MUST be smaller than the "TimeoutSeconds" value.
-        ///
-        /// If not provided, the default value of "TimeoutSeconds" is 60.
-        #[serde(flatten, default)]
-        timeout: Option<TimeoutSecondsOrPath>,
-
-        /// See docs for 'timeout' field
-        #[serde(flatten)]
-        heartbeat: Option<HeartbeatSecondsOrPath>, //TODO: validation! If provided, the "HeartbeatSeconds" interval MUST be smaller than the "TimeoutSeconds" value.
-
-        /// A Task State MAY include a "Credentials" field, whose value MUST be a JSON object whose
-        /// value is defined by the interpreter.
-        /// The States language does not constrain the value of the "Credentials" field.
-        /// The interpreter will use the specified credentials to execute the work identified by the state's "Resource" field.
-        credentials: Option<Value>,
-
-        // Common fields
-        comment: Option<String>,
-        input_path: Option<DynamicValue>,
-        output_path: Option<DynamicValue>,
-        #[serde(flatten)]
-        end_or_next: EndOrNext,
-        result_path: Option<DynamicValue>,
-        parameters: Option<Parameters>,
-        result_selector: Option<ResultSelector>,
-        retry: Option<Vec<Retrier>>,
-        catch: Option<Vec<Catcher>>,
-    },
-    ///
-    #[serde(rename_all = "PascalCase")]
-    Parallel {
-        // Common fields
-        comment: Option<String>,
-        input_path: Option<DynamicValue>,
-        output_path: Option<DynamicValue>,
-        #[serde(flatten)]
-        end_or_next: EndOrNext,
-        result_path: Option<DynamicValue>,
-        parameters: Option<Parameters>,
-        result_selector: Option<ResultSelector>,
-        retry: Option<Vec<Retrier>>,
-        catch: Option<Vec<Catcher>>,
-    },
-    ///
-    #[serde(rename_all = "PascalCase")]
-    Map {
-        max_concurrency: Option<u32>,
-        #[serde(alias = "Iterator")]
-        item_processor: MapStateIterator,
-        items_path: Option<DynamicValue>,
-        item_selector: Option<HashMap<InvertedJsonPath, DynamicValue>>,
-        item_batcher: Option<ItemBatcherConfiguration>,
-        result_writer: Option<ResultWriterConfiguration>,
-        tolerated_failure_count: Option<u32>,
-        tolerated_failure_percentage: Option<u32>,
-
-        // Common fields
-        comment: Option<String>,
-        input_path: Option<DynamicValue>,
-        output_path: Option<DynamicValue>,
-        #[serde(flatten)]
-        end_or_next: EndOrNext,
-        result_path: Option<DynamicValue>,
-        #[deprecated] // Use `item_selector` instead
-        parameters: Option<Parameters>,
-        result_selector: Option<ResultSelector>,
-        retry: Option<Vec<Retrier>>,
-        catch: Option<Vec<Catcher>>,
-    },
-    #[serde(rename_all = "PascalCase")]
-    Pass {
-        // Common fields
-        comment: Option<String>,
-        input_path: Option<DynamicValue>,
-        output_path: Option<DynamicValue>,
-        #[serde(flatten)]
-        end_or_next: EndOrNext,
-        result_path: Option<DynamicValue>,
-        parameters: Option<Payload>,
-    },
-    #[serde(rename_all = "PascalCase")]
-    Wait {
-        #[serde(flatten)]
-        duration: WaitDuration,
-        // Common fields
-        comment: Option<String>,
-        input_path: Option<DynamicValue>,
-        output_path: Option<DynamicValue>,
-        #[serde(flatten)]
-        end_or_next: EndOrNext,
-    },
-
-    ///
-    #[serde(rename_all = "PascalCase")]
-    Choice {
-        choices: Vec<ChoiceRule>,
-        default: Option<String>,
-
-        // Common fields
-        comment: Option<String>,
-        input_path: Option<DynamicValue>,
-        output_path: Option<DynamicValue>,
-    },
-    #[serde(rename_all = "PascalCase")]
-    Succeed {
-        // Common fields
-        comment: Option<String>,
-        input_path: Option<DynamicValue>,
-        output_path: Option<DynamicValue>,
-    },
-    #[serde(rename_all = "PascalCase")]
-    Fail {
-        #[serde(flatten)]
-        error: Option<FailStateErrorField>,
-        #[serde(flatten)]
-        cause: Option<FailStateCauseField>,
-        // Common fields
-        comment: Option<String>,
-    },
+    Task(Task),
+    Parallel(Parallel),
+    Map(Map),
+    Pass(Pass),
+    Wait(Wait),
+    Choice(Choice),
+    Succeed(Succeed),
+    Fail(Fail),
 }
 
-#[derive(Deserialize, Debug, PartialEq, Eq)]
+#[derive(Deserialize, Clone, Debug, PartialEq, Eq)]
+#[serde(from = "RawEndOrNext")]
 pub enum EndOrNext {
-    End(bool), //TODO: Check how to remove this "bool"
+    End,
     Next(String),
+}
+
+impl EndOrNext {
+    pub fn into_next_state_name(self) -> Option<String> {
+        match self {
+            EndOrNext::End => None,
+            EndOrNext::Next(name) => Some(name),
+        }
+    }
+}
+
+// HACK: Use this type to mask the fact that the "End" field cannot be modeled with raw serde as
+//       specified in the spec. We have to ignore its value.
+#[derive(Deserialize)]
+enum RawEndOrNext {
+    #[allow(dead_code)]
+    End(bool),
+    Next(String),
+}
+
+impl From<RawEndOrNext> for EndOrNext {
+    fn from(re: RawEndOrNext) -> Self {
+        match re {
+            RawEndOrNext::End(_) => EndOrNext::End,
+            RawEndOrNext::Next(val) => EndOrNext::Next(val),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use anyhow::Result;
+    use rstest::*;
+
+    #[rstest]
+    #[case(r#"{"End": true}"#, EndOrNext::End)]
+    #[case(r#"{"End": false}"#, EndOrNext::End)]
+    #[case(r#"{"Next": "foo"}"#, EndOrNext::Next("foo".to_string()))]
+    fn parse_end_or_next(#[case] definition: &str, #[case] expected: EndOrNext) -> Result<()> {
+        let actual: EndOrNext = serde_json::from_str(definition)?;
+        assert_eq!(actual, expected);
+        Ok(())
+    }
 }

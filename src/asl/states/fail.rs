@@ -1,4 +1,4 @@
-use crate::asl::types::DynamicValue;
+use crate::asl::types::{DynamicValue, ExecutionInput};
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]
@@ -11,4 +11,16 @@ pub enum FailStateErrorField {
 pub enum FailStateCauseField {
     Cause(String),
     CausePath(DynamicValue),
+}
+
+#[derive(Deserialize, Debug, PartialEq, Eq)]
+#[serde(rename_all = "PascalCase")]
+pub struct Fail {
+    #[serde(flatten)]
+    pub error: Option<FailStateErrorField>,
+    #[serde(flatten)]
+    pub cause: Option<FailStateCauseField>,
+
+    // Common fields
+    pub comment: Option<String>,
 }

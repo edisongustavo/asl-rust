@@ -1,4 +1,4 @@
-use crate::asl::types::{DynamicValue, DynamicValueEvaluateError, ExecutionInput, Timestamp};
+use crate::asl::types::{DynamicValue, DynamicValueEvaluateError, ExecutionInput, TimestampType};
 use serde::Deserialize;
 use serde_json::{Number, Value};
 use thiserror::Error;
@@ -58,19 +58,19 @@ pub enum Operation {
 
     BooleanEquals(bool),
 
-    TimestampEquals(Timestamp),
+    TimestampEquals(TimestampType),
     TimestampEqualsPath(DynamicValue),
 
-    TimestampLessThan(Timestamp),
+    TimestampLessThan(TimestampType),
     TimestampLessThanPath(DynamicValue),
 
-    TimestampGreaterThan(Timestamp),
+    TimestampGreaterThan(TimestampType),
     TimestampGreaterThanPath(DynamicValue),
 
-    TimestampLessThanEquals(Timestamp),
+    TimestampLessThanEquals(TimestampType),
     TimestampLessThanEqualsPath(DynamicValue),
 
-    TimestampGreaterThanEquals(Timestamp),
+    TimestampGreaterThanEquals(TimestampType),
     TimestampGreaterThanEqualsPath(DynamicValue),
 
     IsNull,
@@ -115,10 +115,13 @@ pub struct ChoiceRule {
 pub enum ChoiceEvaluationError {
     #[error("Wrong type for value '{val:?}', expected a '{expected_type}'")]
     WrongType { val: Value, expected_type: String },
+
     #[error("Can't parse the string into timestamp: {0}")]
     ParseTimestampError(String),
+
     #[error("Evaluation error")]
     EvaluateError(DynamicValueEvaluateError),
+
     #[error("Value not found from input")]
     ValueNotFound,
 }
@@ -166,7 +169,7 @@ impl Operation {
         // TODO: is there a cleaner way to do this?
         match self {
             Operation::StringEquals(expected) => match_string(input, expected, |a, b| a == b),
-            // Operation::StringEqualsPath(expected) => match_string(value, expected, |a, b| a == b),
+            // Operation::StringEqualsPath(path) => match_string(value, expected, |a, b| a == b),
             // Operation::StringLessThan(expected) => match_string(value, expected, |a, b| a < b),
             // Operation::StringLessThanPath(expected) => match_string(&value.from_json_path(expected), |a, b| a < b),
             // Operation::StringGreaterThan(expected) => match_string(value, expected, |a, b| a > b),
@@ -266,4 +269,16 @@ impl ComposedExpression {
             }
         }
     }
+}
+
+#[derive(Deserialize, Debug, PartialEq, Eq)]
+#[serde(rename_all = "PascalCase")]
+pub struct Choice {
+    pub choices: Vec<ChoiceRule>,
+    pub default: Option<String>,
+
+    // Common fields
+    pub comment: Option<String>,
+    pub input_path: Option<DynamicValue>,
+    pub output_path: Option<DynamicValue>,
 }
