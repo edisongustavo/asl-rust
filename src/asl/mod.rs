@@ -8,7 +8,7 @@ pub mod instrinsic_functions;
 pub mod state_machine;
 pub mod states;
 pub mod types;
-mod itertools_utils;
+pub mod itertools_utils;
 
 // TODO: Move into the handlers
 pub struct HandlerOutput {

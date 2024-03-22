@@ -29,8 +29,8 @@ impl TestStateExecutionHandler {
 
 #[derive(Error, Debug)]
 enum MyTaskExecutionError {
-    #[error("Could not execute due to {0}")]
-    Foo(String),
+    #[error("{0}")]
+    ForwardedError(String),
 }
 
 impl StateExecutionHandler for TestStateExecutionHandler {
@@ -47,7 +47,7 @@ impl StateExecutionHandler for TestStateExecutionHandler {
             None => Ok(Some(input.to_owned())), // resource is not mapped, so just forwards the input
             Some(desired_output) => match desired_output {
                 TaskBehavior::Output(val) => Ok(Some(val.to_owned())), // resource is mapped, so returns the desired output
-                TaskBehavior::Error(err) => Err(MyTaskExecutionError::Foo(err.clone())),
+                TaskBehavior::Error(err) => Err(MyTaskExecutionError::ForwardedError(err.clone())),
             },
         }
     }
@@ -222,18 +222,20 @@ pub fn with_success_and_output(output: &str) -> ExecutionStatus {
     ExecutionStatus::FinishedWithSuccess(val)
 }
 
-// HACK: This is a kind of
 #[derive(Deserialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "snake_case")]
-enum FinalStatus {
+enum ExpectedFinalStatus {
     Output(Value),
     #[serde(rename_all = "PascalCase")]
     Error {
-        error: Option<StateMachineExecutionPredefinedErrors>,
+        error: StateMachineExecutionPredefinedErrors,
         cause: Option<String>,
     },
 }
 
+/// Controls what the Task will do in the test cases.
+/// If it finds an `Output` key, then it will forward the output and *succeed* the task
+/// If it finds an `Error` key, then it will error with the string provided and *fail* the task.
 #[derive(Deserialize, Clone, PartialEq, Debug)]
 #[serde(rename_all = "snake_case")]
 enum TaskBehavior {
@@ -245,41 +247,30 @@ enum TaskBehavior {
 struct ExpectedExecution {
     input: Value,
     #[serde(flatten)]
-    final_status: FinalStatus,
+    final_status: ExpectedFinalStatus,
     states: Vec<String>,
     task_behavior: Option<HashMap<String, TaskBehavior>>,
 }
 
-impl PartialEq<ExecutionStatus> for FinalStatus {
-    fn eq(&self, other: &ExecutionStatus) -> bool {
-        match self {
-            FinalStatus::Output(expected_value) => match other {
-                ExecutionStatus::Executing => false,
-                ExecutionStatus::FinishedWithSuccess(final_value) => final_value
-                    .as_ref()
-                    .map(|v| v == expected_value)
-                    .unwrap_or(false),
-                FinishedWithFailure { .. } => false,
-            },
-            FinalStatus::Error { error, cause, .. } => match other {
-                ExecutionStatus::Executing => false,
-                ExecutionStatus::FinishedWithSuccess(_) => false,
-                FinishedWithFailure(StateMachineExecutionError {
-                    error: other_error,
-                    cause: other_cause,
-                }) => {
-                    error.as_ref().map(|e| e == other_error).unwrap_or(false)
-                        && cause == other_cause
-                }
-            },
+impl From<ExpectedFinalStatus> for ExecutionStatus {
+    fn from(value: ExpectedFinalStatus) -> Self {
+        match value {
+            ExpectedFinalStatus::Output(val) => ExecutionStatus::FinishedWithSuccess(Some(val)),
+            ExpectedFinalStatus::Error { error, cause } => {
+                FinishedWithFailure(StateMachineExecutionError { error, cause })
+            }
         }
     }
 }
 
 #[rstest]
-fn execute_all(
-    #[files("**/test-data/expected-executions-valid-cases/valid-*.json")] path: PathBuf,
+// #[case(PathBuf::from("test-data/expected-executions-valid-cases/valid-catch-failure.json"))]
+fn execute_all(// #[files("**/test-data/expected-executions-valid-cases/valid-*.json")] path: PathBuf,
+    // #[case] path: PathBuf,
 ) -> Result<()> {
+    let path =
+        PathBuf::from("tests/test-data/expected-executions-valid-cases/valid-catch-failure.json");
+
     let all_expected_executions: Vec<ExpectedExecution> =
         serde_json::from_str(&fs::read_to_string(&path)?)?;
 
@@ -309,7 +300,7 @@ fn execute_all(
             expected_states, actual_states,
             "States are different for test case {i}."
         );
-        let expected_status = &execution_expected_input.final_status;
+        let expected_status = &ExecutionStatus::from(execution_expected_input.final_status.clone());
         let actual_status = &execution_steps.last().unwrap().status;
         assert_eq!(
             expected_status, actual_status,

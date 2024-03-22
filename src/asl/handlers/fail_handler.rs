@@ -51,7 +51,7 @@ impl<'a, H: StateExecutionHandler> Execution<'a, H> {
                 FailStateErrorField::Error(err) => err.into(),
                 FailStateErrorField::ErrorPath(err_path) => {
                     evaluate_path_as_string(input, err_path)
-                        .map_err(|err| FailStateExecutionError::MalformedErrorPath(err))?
+                        .map_err(FailStateExecutionError::MalformedErrorPath)?
                         .ok_or(FailStateExecutionError::ErrorPathIsNotAString)?
                 }
             },
@@ -62,7 +62,7 @@ impl<'a, H: StateExecutionHandler> Execution<'a, H> {
                 FailStateCauseField::Cause(cause_string) => Some(cause_string.into()),
                 FailStateCauseField::CausePath(cause_path) => {
                     evaluate_path_as_string(input, cause_path)
-                        .map_err(|err| FailStateExecutionError::MalformedCausePath(err))?
+                        .map_err(FailStateExecutionError::MalformedCausePath)?
                 }
             },
         };

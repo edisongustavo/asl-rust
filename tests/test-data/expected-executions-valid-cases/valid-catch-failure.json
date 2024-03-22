@@ -10,12 +10,10 @@
 
   {
     "input": "",
-    "error": {
-      "Error": "CustomError"
-    },
+    "output": "This is a fallback from a custom lambda function exception",
     "states": ["HelloWorld", "CustomErrorFallback"],
     "task_behavior": {
-      "FUNCTION_NAME": {"error":  "CustomError"}
+      "FUNCTION_NAME": {"error": "CustomError"}
     }
   },
 

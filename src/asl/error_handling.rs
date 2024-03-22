@@ -96,21 +96,26 @@ pub enum StateMachineExecutionPredefinedErrors {
 pub fn matches_error(expected_error: &str, catch: &StateMachineExecutionPredefinedErrors) -> bool {
     match catch {
         StateMachineExecutionPredefinedErrors::StatesALL => true,
-        StateMachineExecutionPredefinedErrors::Custom(error) => error == expected_error,
-        e => false, // TODO: implement. Use the 'strum' crate?
-                    // StateMachineExecutionError::StatesHeartbeatTimeout => {}
-                    // StateMachineExecutionError::StatesTimeout => {}
-                    // StateMachineExecutionError::StatesTaskFailed => {}
-                    // StateMachineExecutionError::StatesPermissions => {}
-                    // StateMachineExecutionError::StatesResultPathMatchFailure => {}
-                    // StateMachineExecutionError::StatesParameterPathFailure => {}
-                    // StateMachineExecutionError::StatesBranchFailed => {}
-                    // StateMachineExecutionError::StatesNoChoiceMatched => {}
-                    // StateMachineExecutionError::StatesIntrinsicFailure => {}
-                    // StateMachineExecutionError::StatesExceedToleratedFailureThreshold => {}
-                    // StateMachineExecutionError::StatesItemReaderFailed => {}
-                    // StateMachineExecutionError::StatesResultWriterFailed => {}
+        e => {
+            let actual_error = e.to_string();
+            actual_error == expected_error
+        }
     }
+    //
+    //     StateMachineExecutionPredefinedErrors::Custom(error) => error == expected_error,
+    //     StateMachineExecutionPredefinedErrors::StatesHeartbeatTimeout => expected_error == "States.HeartbeatTimeout",
+    //     StateMachineExecutionPredefinedErrors::StatesTimeout => {}
+    //     StateMachineExecutionPredefinedErrors::StatesTaskFailed => {}
+    //     StateMachineExecutionPredefinedErrors::StatesPermissions => {}
+    //     StateMachineExecutionPredefinedErrors::StatesResultPathMatchFailure => {}
+    //     StateMachineExecutionPredefinedErrors::StatesParameterPathFailure => {}
+    //     StateMachineExecutionPredefinedErrors::StatesBranchFailed => {}
+    //     StateMachineExecutionPredefinedErrors::StatesNoChoiceMatched => {}
+    //     StateMachineExecutionPredefinedErrors::StatesIntrinsicFailure => {}
+    //     StateMachineExecutionPredefinedErrors::StatesExceedToleratedFailureThreshold => {}
+    //     StateMachineExecutionPredefinedErrors::StatesItemReaderFailed => {}
+    //     StateMachineExecutionPredefinedErrors::StatesResultWriterFailed => {}
+    // }
 }
 
 #[derive(Deserialize, Debug, PartialEq, Eq)]

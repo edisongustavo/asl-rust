@@ -168,10 +168,15 @@ where
                     next_state: end_or_next.clone(),
                 })
             }
-            States::Pass(Pass { end_or_next, .. }) => Ok(HandlerOutput {
-                output: None,
-                next_state: end_or_next.clone(),
-            }),
+            States::Pass(Pass { end_or_next, .. }) => {
+                //TODO: Handle InputPath/OutputPath
+                //TODO: Handle Result/ResultPath
+                let output = None;
+                Ok(HandlerOutput {
+                    output,
+                    next_state: end_or_next.clone(),
+                })
+            },
             States::Wait(wait) => Ok(self.handle_wait(wait, state_input)?),
             States::Choice(choice) => Ok(self.handle_choice(choice, state_input)?),
             States::Succeed(_succeed) => Ok(HandlerOutput {

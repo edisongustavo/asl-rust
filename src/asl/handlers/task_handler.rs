@@ -49,7 +49,7 @@ impl<'a, H: StateExecutionHandler> Execution<'a, H> {
                 };
                 Ok(ret)
             }
-            Err(err) => {
+            Err(user_task_execution_error) => {
                 // function failed
                 match &task.catch {
                     Some(catchers) => {
@@ -57,7 +57,7 @@ impl<'a, H: StateExecutionHandler> Execution<'a, H> {
                             if catcher
                                 .error_equals
                                 .iter()
-                                .any(|e| matches_error(&err.to_string(), e))
+                                .any(|catcher_error| matches_error(&user_task_execution_error.to_string(), catcher_error))
                             {
                                 let next_state = EndOrNext::Next(catcher.next.clone());
                                 let ret = HandlerOutput {
